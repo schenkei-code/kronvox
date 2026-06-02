@@ -1,0 +1,29 @@
+node_modules/
+dist/
+*.log
+.env
+.env.*
+*.tsbuildinfo
+.DS_Store
+/tmp/
+*.local.png
+
+# local run artifacts
+demo_*.png
+up.log
+bake.log
+nohup.out
+ui_preview*.png
+web.log
+_scr.png
+v1.png
+v2.png
+
+# rust build output
+target/
+apps/desktop/icon-src.png
+apps/desktop/src-tauri/icons/android/
+apps/desktop/src-tauri/icons/ios/
+
+# machine-specific cargo linker override (local only)
+apps/desktop/src-tauri/.cargo/config.toml

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KRONVOX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#0a0a0b;--paper:#f2f2ef;--acid:#d7ff2e;--line:#23232a;--muted:#76767e;--hot:#ff5b4d;
+    --e:cubic-bezier(0.23,1,0.32,1)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{font-family:"Space Grotesk",system-ui,sans-serif;background:var(--bg);color:var(--paper);height:100vh;overflow:hidden;
+    -webkit-font-smoothing:antialiased;user-select:none}
+  body::before{content:"";position:fixed;inset:-2px;z-index:0;pointer-events:none;opacity:.5;
+    background:linear-gradient(transparent 0 39px,rgba(255,255,255,.022) 39px 40px),linear-gradient(90deg,transparent 0 39px,rgba(255,255,255,.022) 39px 40px);
+    background-size:40px 40px}
+  .top{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;
+    padding:18px 26px;border-bottom:2px solid var(--paper)}
+  .wm{font-weight:700;font-size:30px;letter-spacing:-.03em;text-transform:uppercase}
+  .wm em{font-style:normal;-webkit-text-stroke:1.5px var(--paper);color:transparent}
+  .pill{display:flex;align-items:center;gap:9px;font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.12em;
+    text-transform:uppercase;border:2px solid var(--line);padding:8px 14px;color:var(--muted)}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+  .pill.ready{border-color:var(--acid);color:var(--acid)} .pill.ready .dot{background:var(--acid);box-shadow:0 0 10px var(--acid)}
+  .pill.booting{border-color:#febc2e;color:#febc2e} .pill.booting .dot{background:#febc2e;animation:pulse 1s infinite}
+  .pill.off{border-color:var(--hot);color:var(--hot)} .pill.off .dot{background:var(--hot)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+  .wrap{position:relative;z-index:2;display:grid;grid-template-columns:auto 1fr;gap:0;height:calc(100vh - 71px)}
+  .left{padding:30px 36px;border-right:2px solid var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+  .frame{position:relative;width:300px;background:#000;border:2px solid var(--paper);padding:8px;
+    transition:box-shadow .26s var(--e)}
+  .frame::before{content:"DEVICE / 01";position:absolute;top:-2px;left:-2px;background:var(--acid);color:#000;
+    font-family:"Space Mono",monospace;font-size:10px;font-weight:700;padding:4px 8px;letter-spacing:.1em;z-index:5}
+  .frame.armed{box-shadow:0 0 0 2px var(--acid),0 0 50px -8px rgba(215,255,46,.5)}
+  .frame:focus{outline:none}
+  .core{position:relative;overflow:hidden;background:#000;min-height:140px;aspect-ratio:1080/2400}
+  .core img{display:block;width:100%;height:auto;cursor:crosshair;-webkit-user-drag:none}
+  .core .placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;text-align:center;padding:20px}
+  .ripple{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;z-index:4;pointer-events:none;
+    border:2px solid var(--acid);background:rgba(215,255,46,.18);animation:rip .55s var(--e) forwards}
+  @keyframes rip{from{transform:scale(.45);opacity:1}to{transform:scale(7);opacity:0}}
+  .hint{width:300px;font-family:"Space Mono",monospace;font-size:11px;line-height:1.6;color:var(--muted);text-align:center}
+  .hint b{color:var(--acid);font-weight:400}
+
+  .right{padding:26px 30px;overflow-y:auto}
+  .card{border:2px solid var(--line);padding:18px 18px 20px;margin-bottom:18px}
+  .card h3{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .card h3 b{color:var(--acid);font-weight:700}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap}
+  button{cursor:pointer;font-family:"Space Grotesk";font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:13px;
+    background:transparent;color:var(--paper);border:2px solid var(--paper);padding:11px 18px;
+    transition:background .15s var(--e),color .15s,transform .12s var(--e)}
+  button:hover{background:var(--acid);border-color:var(--acid);color:#000}
+  button:active{transform:translate(1px,1px)}
+  button.ghost{border-color:var(--line);color:var(--muted)} button.ghost:hover{background:var(--line);color:var(--paper);border-color:var(--line)}
+  .nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  .nav button{padding:12px 0;font-size:18px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .chip{font-size:12px;padding:9px 14px;border-color:var(--line);color:var(--paper)}
+  .row{display:flex;border:2px solid var(--line);margin-top:6px}
+  .row input{flex:1;min-width:0;background:transparent;border:0;color:var(--paper);padding:11px 13px;font-family:"Space Mono",monospace;font-size:13px;outline:none}
+  .row input::placeholder{color:#4e4e55}
+  .row button{border:0;border-left:2px solid var(--line);background:var(--paper);color:#000}
+  .row button:hover{background:var(--acid)}
+  .mcp{display:flex;flex-direction:column;gap:8px}
+  .mcp button{justify-content:flex-start;text-align:left;border-color:var(--line);color:var(--paper);display:flex;align-items:center;gap:10px}
+  .mcp button:hover{border-color:var(--acid)}
+  .mcp .ok{color:var(--acid)}
+  .note{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);line-height:1.6;margin-top:6px}
+  .toast{position:fixed;left:50%;bottom:22px;z-index:70;transform:translateX(-50%) translateY(14px);opacity:0;
+    background:var(--acid);color:#000;padding:10px 18px;font-family:"Space Mono",monospace;font-size:12px;font-weight:700;
+    letter-spacing:.06em;text-transform:uppercase;transition:opacity .25s var(--e),transform .25s var(--e);pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style></head>
+<body>
+  <header class="top">
+    <div class="wm">KRON<em>VOX</em></div>
+    <div class="pill off" id="pill"><span class="dot"></span><span id="pilltext">starting…</span></div>
+  </header>
+
+  <main class="wrap">
+    <div class="left">
+      <div class="frame" id="frame" tabindex="0" title="tap to control · click once then type on your keyboard">
+        <div class="core" id="core">
+          <img id="screen" alt="" draggable="false" style="display:none" />
+          <div class="placeholder" id="ph">no device — press start</div>
+        </div>
+      </div>
+      <div class="hint" id="hint">tap the screen to focus — then just <b>type on your keyboard</b></div>
+    </div>
+
+    <div class="right">
+      <div class="card">
+        <h3><b>Device</b> · virtual phone</h3>
+        <div class="btnrow">
+          <button id="start">Start</button>
+          <button id="stop" class="ghost">Stop</button>
+          <button id="reset" class="ghost">Reset view</button>
+        </div>
+        <div class="nav">
+          <button data-key="back">‹</button><button data-key="home">○</button><button data-key="recent">▢</button>
+        </div>
+        <div class="note" id="devnote">boots the bundled Android runtime — no setup.</div>
+      </div>
+
+      <div class="card">
+        <h3><b>Launch</b> app</h3>
+        <div class="chips">
+          <button class="chip" data-pkg="com.android.settings">Settings</button>
+          <button class="chip" data-pkg="com.android.chrome">Chrome</button>
+          <button class="chip" data-pkg="com.google.android.deskclock">Clock</button>
+        </div>
+        <div class="row"><input id="pkg" placeholder="com.any.package" /><button id="open">Run</button></div>
+      </div>
+
+      <div class="card">
+        <h3><b>Connect</b> your agent · MCP</h3>
+        <div class="mcp">
+          <button data-client="claude">⌘ Copy config for <b style="margin-left:4px">Claude</b></button>
+          <button data-client="openclaw">⌘ Copy config for <b style="margin-left:4px">OpenClaw</b></button>
+          <button data-client="hermes">⌘ Copy config for <b style="margin-left:4px">Hermes</b></button>
+        </div>
+        <div class="note">paste into your client's MCP settings. the agent then sees + drives this phone.</div>
+      </div>
+    </div>
+  </main>
+  <div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body></html>

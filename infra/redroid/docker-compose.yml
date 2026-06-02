@@ -1,0 +1,25 @@
+# Kronvox cloud runtime — one redroid container = one virtual phone.
+# Requires a Linux host with the binder & ashmem kernel modules loaded:
+#   sudo modprobe binder_linux devices="binder,hwbinder,vndbinder"
+#   sudo modprobe ashmem_linux   # (kernels < 5.18; newer use memfd)
+# ARM apps on x86 hosts need libndk/libhoudini translation (see redroid docs).
+#
+# Control it from the host or from Kronvox via ADB:
+#   adb connect localhost:5555
+#   KRONVOX_SERIAL=localhost:5555 kronvox devices
+
+services:
+  phone:
+    image: redroid/redroid:13.0.0-latest
+    container_name: kronvox-phone-1
+    privileged: true
+    ports:
+      - "5555:5555" # adb
+    volumes:
+      - ./data/phone-1:/data # persistent userdata -> logins/sessions survive restarts
+    command:
+      - androidboot.redroid_width=1080
+      - androidboot.redroid_height=2340
+      - androidboot.redroid_dpi=440
+      - androidboot.redroid_fps=30
+    restart: unless-stopped

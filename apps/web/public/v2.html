@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KRONVOX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#0a0a0b;--paper:#f2f2ef;--acid:#d7ff2e;--line:#26262d;--muted:#76767e;
+    --e-out:cubic-bezier(0.23,1,0.32,1);--e-io:cubic-bezier(0.77,0,0.175,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{font-family:"Space Grotesk",system-ui,sans-serif;background:var(--bg);color:var(--paper);
+    min-height:100dvh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  /* faint drifting grid backdrop */
+  body::before{content:"";position:fixed;inset:-2px;z-index:0;pointer-events:none;opacity:.5;
+    background:
+      linear-gradient(transparent 0 39px,rgba(255,255,255,.022) 39px 40px),
+      linear-gradient(90deg,transparent 0 39px,rgba(255,255,255,.022) 39px 40px);
+    background-size:40px 40px;animation:drift 28s linear infinite}
+  @keyframes drift{to{transform:translate(40px,40px)}}
+  /* staggered first-load entrance — seen once, gives the load character */
+  @keyframes enter{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .top,.strip,.deviceWrap,.side{animation:enter .6s var(--e-out) both}
+  .strip{animation-delay:.05s}
+  .deviceWrap{animation-delay:.11s}
+  .side{animation-delay:.17s}
+
+  .top{position:relative;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+    padding:24px 30px 16px;border-bottom:2px solid var(--paper)}
+  .wm{font-weight:700;font-size:clamp(30px,6.5vw,68px);line-height:.82;letter-spacing:-.035em;text-transform:uppercase}
+  .wm em{font-style:normal;-webkit-text-stroke:2px var(--paper);color:transparent}
+  .meta{text-align:right;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;
+    color:var(--muted);text-transform:uppercase;line-height:1.75}
+  .meta .on{color:var(--acid);transition:color .3s var(--e-out)}
+  .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--acid);
+    margin-right:5px;vertical-align:middle;box-shadow:0 0 10px var(--acid);animation:pulse 1.8s var(--e-io) infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .strip{position:relative;z-index:2;display:flex;border-bottom:2px solid var(--paper);
+    font-family:"Space Mono",monospace;font-size:11px;text-transform:uppercase;letter-spacing:.16em}
+  .strip span{padding:9px 18px;border-right:1px solid var(--line);color:var(--muted);white-space:nowrap}
+  .strip span.k{color:var(--acid)}
+
+  .stage{position:relative;z-index:2;display:flex;justify-content:center;align-items:flex-start;
+    gap:0;flex-wrap:wrap;padding:46px 30px 60px}
+
+  /* DEVICE -------------------------------------------------------------- */
+  .deviceWrap{display:flex;flex-direction:column;align-items:center;gap:0}
+  .frame{position:relative;width:300px;background:#000;border:2px solid var(--paper);padding:8px;
+    cursor:pointer;outline:none;transition:transform .22s var(--e-out),box-shadow .26s var(--e-out)}
+  .frame::before{content:"DEVICE / 01";position:absolute;top:-2px;left:-2px;background:var(--acid);color:#000;
+    font-family:"Space Mono",monospace;font-size:10px;font-weight:700;padding:4px 8px;letter-spacing:.1em;z-index:6}
+  .frame::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:5;
+    box-shadow:inset 0 0 0 0 rgba(215,255,46,0);transition:box-shadow .26s var(--e-out)}
+  .frame.armed{box-shadow:0 0 0 2px var(--acid),0 0 50px -8px rgba(215,255,46,.5)}
+  .frame.armed::after{box-shadow:inset 0 0 0 2px rgba(215,255,46,.35)}
+  .core{position:relative;overflow:hidden;background:#000;min-height:120px}
+  .core img{display:block;width:100%;height:auto;cursor:crosshair;user-select:none;-webkit-user-drag:none}
+  .scan{position:absolute;left:0;right:0;height:30%;z-index:3;pointer-events:none;
+    background:linear-gradient(180deg,transparent,rgba(215,255,46,.05) 60%,rgba(215,255,46,.11));
+    mix-blend-mode:screen;animation:scan 6s linear infinite}
+  @keyframes scan{0%{transform:translateY(-110%)}100%{transform:translateY(360%)}}
+  .ripple{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;z-index:4;pointer-events:none;
+    border:2px solid var(--acid);background:rgba(215,255,46,.18);animation:rip .55s var(--e-out) forwards}
+  @keyframes rip{from{transform:scale(.45);opacity:1}to{transform:scale(7);opacity:0}}
+  .booting{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;
+    font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+
+  /* hardware nav directly under the device */
+  .nav{display:grid;grid-template-columns:repeat(3,1fr);width:300px;border:2px solid var(--paper);border-top:0}
+  .nav button{height:50px;border:0;background:transparent;color:var(--paper);font-size:19px;cursor:pointer;
+    border-right:1px solid var(--line);transition:background .15s var(--e-out),color .15s,transform .12s var(--e-out)}
+  .nav button:last-child{border-right:0}
+  .nav button:hover{background:var(--paper);color:#000}
+  .nav button:active{transform:scale(.96)}
+  .nav .lab{display:block;font-family:"Space Mono",monospace;font-size:8px;letter-spacing:.14em;
+    color:var(--muted);margin-top:2px;text-transform:uppercase}
+  .nav button:hover .lab{color:#000}
+
+  .kbHint{width:300px;margin-top:14px;font-family:"Space Mono",monospace;font-size:11px;line-height:1.6;
+    letter-spacing:.04em;color:var(--muted);text-align:center;transition:color .3s var(--e-out)}
+  .kbHint b{color:var(--acid);font-weight:400}
+  .frame.armed ~ .kbHint{color:var(--paper)}
+
+  /* SIDE: editorial copy + app launcher ------------------------------- */
+  .side{max-width:360px;padding:4px 0 0 56px}
+  @media(max-width:760px){.side{padding:48px 0 0;max-width:300px}}
+  .lead{font-size:clamp(26px,4vw,38px);font-weight:700;line-height:1.02;letter-spacing:-.02em;text-transform:uppercase}
+  .lead em{font-style:normal;color:var(--acid)}
+  .sub{margin-top:18px;font-family:"Space Mono",monospace;font-size:13px;line-height:1.8;color:var(--muted)}
+  .sub b{color:var(--paper);font-weight:400}
+
+  .launch{margin-top:34px;border-top:2px solid var(--paper);padding-top:16px}
+  .launch .bn{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+  .launch .num{font-family:"Space Mono",monospace;font-size:12px;color:var(--acid)}
+  .launch .ti{font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{height:40px;padding:0 16px;background:transparent;color:var(--paper);border:2px solid var(--paper);
+    font-family:"Space Grotesk";font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.05em;
+    cursor:pointer;transition:background .15s var(--e-out),color .15s,transform .12s var(--e-out)}
+  .chip:hover{background:var(--acid);border-color:var(--acid);color:#000}
+  .chip:active{transform:translate(1px,1px) scale(.98)}
+  .pkgRow{display:flex;margin-top:10px;border:2px solid var(--line)}
+  .pkgRow input{flex:1;min-width:0;background:transparent;border:0;color:var(--paper);padding:11px 14px;
+    font-family:"Space Mono",monospace;font-size:13px;outline:none}
+  .pkgRow input::placeholder{color:#4e4e55}
+  .pkgRow input:focus{box-shadow:inset 0 -2px 0 var(--acid)}
+  .pkgRow button{border:0;border-left:2px solid var(--line);background:var(--paper);color:#000;padding:0 18px;
+    font-family:"Space Grotesk";font-weight:700;font-size:12px;text-transform:uppercase;cursor:pointer;
+    transition:background .15s var(--e-out),transform .12s var(--e-out)}
+  .pkgRow button:hover{background:var(--acid)}
+  .pkgRow button:active{transform:translate(1px,1px)}
+
+  .agent{margin-top:30px;border-top:1px solid var(--line);padding-top:16px;
+    font-family:"Space Mono",monospace;font-size:12px;line-height:1.8;color:var(--muted)}
+  .agent b{color:var(--acid);font-weight:400}
+
+  .toast{position:fixed;left:50%;bottom:24px;z-index:70;transform:translateX(-50%) translateY(16px);opacity:0;
+    background:var(--acid);color:#000;padding:10px 18px;font-family:"Space Mono",monospace;font-size:12px;
+    font-weight:700;letter-spacing:.08em;text-transform:uppercase;pointer-events:none;
+    transition:opacity .25s var(--e-out),transform .25s var(--e-out)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* touch devices fire :hover on tap — neutralise hover styling there */
+  @media(hover:none){
+    .nav button:hover{background:transparent;color:var(--paper)}
+    .nav button:hover .lab{color:var(--muted)}
+    .chip:hover{background:transparent;color:var(--paper);border-color:var(--paper)}
+    .pkgRow button:hover{background:var(--paper)}
+  }
+  /* reduced motion: keep gentle opacity, drop movement + ambient loops */
+  @media(prefers-reduced-motion:reduce){
+    .top,.strip,.deviceWrap,.side,.scan,.dot,body::before{animation:none!important}
+    .frame,.toast{transition:opacity .2s ease!important}
+    .ripple{display:none}
+  }
+</style></head>
+<body>
+  <header class="top">
+    <div class="wm">KRON<em>VOX</em></div>
+    <div class="meta">your agent gets a smartphone<br>virtual device · mcp<br>
+      <span class="on" id="dev"><span class="dot"></span>connecting</span></div>
+  </header>
+  <div class="strip"><span class="k">SYSTEM/KRONVOX</span><span>ANDROID 14</span><span id="res">—</span><span>AGENT-CONTROLLED</span></div>
+
+  <main class="stage">
+    <div class="deviceWrap">
+      <div class="frame" id="frame" tabindex="0" title="tap to control · click once then type on your keyboard">
+        <div class="core" id="core">
+          <img id="screen" alt="phone" draggable="false" />
+          <div class="scan"></div>
+          <div class="booting" id="booting">booting…</div>
+        </div>
+      </div>
+      <div class="nav">
+        <button data-key="back">‹<span class="lab">back</span></button>
+        <button data-key="home">○<span class="lab">home</span></button>
+        <button data-key="recent">▢<span class="lab">recent</span></button>
+      </div>
+      <div class="kbHint" id="kbHint">tap the screen to focus — then just <b>type on your keyboard</b></div>
+    </div>
+
+    <div class="side">
+      <div class="lead">A real phone,<br>driven by <em>code.</em></div>
+      <div class="sub">Tap and swipe straight on the screen. Click it once, then type with your own keyboard — keystrokes go to the focused field. <b>No control panel.</b></div>
+
+      <div class="launch">
+        <div class="bn"><span class="num">02</span><span class="ti">Launch app</span></div>
+        <div class="chips">
+          <button class="chip" data-pkg="com.android.settings">Settings</button>
+          <button class="chip" data-pkg="com.android.chrome">Chrome</button>
+          <button class="chip" data-pkg="com.google.android.deskclock">Clock</button>
+        </div>
+        <div class="pkgRow"><input id="pkg" placeholder="com.any.package" /><button id="open">Run</button></div>
+      </div>
+
+      <div class="agent">Plugs into <b>Claude · OpenClaw · Hermes</b> over MCP — the agent taps, types, screenshots and reads the same screen, programmatically.</div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+<script>
+  const img=document.getElementById("screen"),devL=document.getElementById("dev"),core=document.getElementById("core"),
+        frame=document.getElementById("frame"),booting=document.getElementById("booting"),resL=document.getElementById("res");
+  let dev={width:1080,height:2400},armed=false,everLoaded=false;
+
+  function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");
+    clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1200);}
+  async function post(u,d){try{return (await fetch(u,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(d||{})})).ok;}catch{return false;}}
+  async function loadSize(){try{dev=await(await fetch("/size")).json();resL.textContent=dev.width+"×"+dev.height;}catch{}}
+
+  function refresh(){const n=new Image();
+    n.onload=()=>{img.src=n.src;if(!everLoaded){everLoaded=true;booting.style.display="none";}
+      devL.innerHTML='<span class="dot"></span>live';};
+    n.onerror=()=>{devL.innerHTML='<span class="dot" style="background:#ff4d4d;box-shadow:0 0 10px #ff4d4d"></span>no device';};
+    n.src="/screen?t="+Date.now();}
+  setInterval(refresh,850);refresh();loadSize();
+
+  // ---- touchscreen: tap + swipe straight on the screen ----
+  function toDevice(e){const r=img.getBoundingClientRect();
+    return{x:Math.round((e.clientX-r.left)/r.width*dev.width),y:Math.round((e.clientY-r.top)/r.height*dev.height),
+           dx:e.clientX-r.left,dy:e.clientY-r.top};}
+  function ripple(x,y){const s=document.createElement("span");s.className="ripple";s.style.left=x+"px";s.style.top=y+"px";
+    core.appendChild(s);setTimeout(()=>s.remove(),560);}
+  let down=null;
+  img.addEventListener("pointerdown",e=>{down=toDevice(e);});
+  img.addEventListener("pointerup",async e=>{if(!down)return;const up=toDevice(e);ripple(up.dx,up.dy);
+    const d=Math.hypot(up.x-down.x,up.y-down.y);
+    if(d>24){await post("/swipe",{x1:down.x,y1:down.y,x2:up.x,y2:up.y,ms:240});toast("swipe");}
+    else{await post("/tap",{x:up.x,y:up.y});toast("tap "+up.x+","+up.y);}down=null;});
+
+  // ---- arm / disarm the physical keyboard ----
+  function arm(on){armed=on;frame.classList.toggle("armed",on);
+    document.getElementById("kbHint").innerHTML=on
+      ? 'keyboard <b>armed</b> — type now · esc to release'
+      : 'tap the screen to focus — then just <b>type on your keyboard</b>';}
+  frame.addEventListener("focus",()=>arm(true));
+  frame.addEventListener("blur",()=>arm(false));
+  frame.addEventListener("click",()=>frame.focus());
+
+  // physical keyboard → device
+  frame.addEventListener("keydown",async e=>{
+    if(e.key==="Escape"){frame.blur();return;}
+    if(e.metaKey||e.ctrlKey||e.altKey)return;
+    if(e.key==="Enter"){e.preventDefault();await post("/key",{key:"enter"});return;}
+    if(e.key==="Backspace"){e.preventDefault();await post("/key",{key:"delete"});return;}
+    if(e.key==="Tab"){e.preventDefault();await post("/key",{key:"tab"});return;}
+    if(e.key===" "){e.preventDefault();await post("/key",{key:"space"});return;}
+    if(e.key.length===1){e.preventDefault();await post("/type",{text:e.key});}
+  });
+
+  // ---- app launcher ----
+  document.getElementById("open").onclick=()=>{const p=document.getElementById("pkg").value.trim();
+    if(p){post("/open",{package:p});toast("run "+p);}};
+  document.getElementById("pkg").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("open").click();});
+  document.querySelectorAll("[data-pkg]").forEach(b=>b.onclick=()=>{post("/open",{package:b.dataset.pkg});toast("run "+b.dataset.pkg);});
+  document.querySelectorAll("[data-key]").forEach(b=>b.onclick=()=>{post("/key",{key:b.dataset.key});toast(b.dataset.key);});
+</script>
+</body></html>

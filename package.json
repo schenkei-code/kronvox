@@ -1,0 +1,23 @@
+{
+  "name": "kronvox",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Your agent gets a smartphone. A virtual Android phone AI agents can use — local or cloud — over MCP.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "mcp": "npm run start -w @kronvox/mcp",
+    "mcp:dev": "npm run dev -w @kronvox/mcp",
+    "devices": "npm run start -w @kronvox/cli -- devices"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.19.41"
+  }
+}

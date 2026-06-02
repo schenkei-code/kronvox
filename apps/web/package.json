@@ -1,0 +1,16 @@
+{
+  "name": "@kronvox/web",
+  "version": "0.1.0",
+  "description": "KRONVOX control UI — live phone view + touch/type, in the browser (and inside the desktop app).",
+  "type": "module",
+  "bin": {
+    "kronvox-web": "src/server.mjs"
+  },
+  "scripts": {
+    "start": "node src/server.mjs"
+  },
+  "dependencies": {
+    "@kronvox/control": "*"
+  },
+  "license": "MIT"
+}

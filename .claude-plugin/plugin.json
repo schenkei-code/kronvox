@@ -1,0 +1,14 @@
+{
+  "name": "kronvox",
+  "version": "0.1.0",
+  "description": "Your agent gets a smartphone. Control a virtual Android phone (local emulator or cloud) from Claude over MCP.",
+  "mcpServers": {
+    "kronvox": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/packages/mcp/dist/server.js"],
+      "env": {
+        "KRONVOX_ADB": "adb"
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@kronvox/cli",
+  "version": "0.1.0",
+  "description": "Kronvox CLI — boot a local phone and serve it to your agent.",
+  "type": "module",
+  "bin": {
+    "kronvox": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kronvox/control": "*",
+    "extract-zip": "^2.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.16.0"
+  },
+  "license": "MIT"
+}

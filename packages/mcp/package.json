@@ -1,0 +1,25 @@
+{
+  "name": "@kronvox/mcp",
+  "version": "0.1.0",
+  "description": "Kronvox MCP server — gives any MCP-capable agent (Claude, OpenClaw, Hermes) a smartphone.",
+  "type": "module",
+  "main": "dist/server.js",
+  "bin": {
+    "kronvox-mcp": "dist/server.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx src/server.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@kronvox/control": "*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "tsx": "^4.16.0"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KRONVOX</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#030409;--cy:#00e7ff;--mg:#ff36e6;--txt:#dffaff;--muted:#5f7e8c;--ease:cubic-bezier(0.23,1,0.32,1)}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Space Grotesk",sans-serif;background:var(--bg);color:var(--txt);min-height:100dvh;overflow-x:hidden;position:relative}
+  body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(700px 560px at 14% -6%,rgba(0,231,255,.18),transparent 60%),
+      radial-gradient(620px 520px at 100% 6%,rgba(255,54,230,.14),transparent 58%),
+      linear-gradient(rgba(0,231,255,.035) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,231,255,.035) 1px,transparent 1px);
+    background-size:auto,auto,44px 44px,44px 44px;animation:drift 32s ease-in-out infinite alternate;will-change:transform}
+  @keyframes drift{to{transform:translate3d(-2.5%,2%,0) scale(1.06)}}
+  body::after{content:"";position:fixed;inset:0;z-index:60;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px);mix-blend-mode:overlay;opacity:.5}
+
+  .top{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:16px;padding:18px 30px;
+    background:rgba(3,4,9,.55);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,231,255,.18)}
+  .logo{font-weight:700;font-size:23px;letter-spacing:.34em;color:#fff;text-shadow:0 0 18px rgba(0,231,255,.7),0 0 4px rgba(0,231,255,.9)}
+  .logo b{color:var(--cy)}
+  .sub{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+  .live{margin-left:auto;font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.12em;color:var(--cy);
+    display:flex;align-items:center;gap:9px;border:1px solid rgba(0,231,255,.35);padding:8px 14px;border-radius:4px;text-shadow:0 0 10px rgba(0,231,255,.6)}
+  .led{width:8px;height:8px;border-radius:50%;background:var(--cy);box-shadow:0 0 12px var(--cy);animation:blink 1.6s steps(1) infinite}
+  .led.off{background:var(--mg);box-shadow:0 0 12px var(--mg)}
+  @keyframes blink{50%{opacity:.35}}
+
+  .wrap{position:relative;z-index:1;display:grid;grid-template-columns:auto 360px;gap:50px;padding:54px 30px 80px;max-width:1080px;margin:0 auto;align-items:start}
+  @media(max-width:840px){.wrap{grid-template-columns:1fr;justify-items:center;gap:36px;padding:34px 18px}}
+
+  .deck{justify-self:center;position:relative;padding:26px}
+  .bracket{position:absolute;width:30px;height:30px;border:2px solid var(--cy);opacity:.8;filter:drop-shadow(0 0 6px var(--cy))}
+  .b1{top:0;left:0;border-right:0;border-bottom:0}.b2{top:0;right:0;border-left:0;border-bottom:0}
+  .b3{bottom:0;left:0;border-right:0;border-top:0}.b4{bottom:0;right:0;border-left:0;border-top:0}
+  .halo{position:absolute;inset:6px;border-radius:42px;background:radial-gradient(circle at 50% 40%,rgba(0,231,255,.28),transparent 62%);filter:blur(26px);z-index:-1}
+  .core{position:relative;width:290px;border-radius:38px;overflow:hidden;background:#000;
+    border:1.5px solid rgba(0,231,255,.5);box-shadow:0 0 40px rgba(0,231,255,.3),inset 0 0 0 2px rgba(0,0,0,.9)}
+  .core img{display:block;width:100%;height:auto;cursor:crosshair;user-select:none;-webkit-user-drag:none}
+  .notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:86px;height:18px;background:#000;border-radius:0 0 12px 12px;z-index:3}
+  .scan{position:absolute;left:0;right:0;height:120px;z-index:2;pointer-events:none;mix-blend-mode:screen;
+    background:linear-gradient(180deg,transparent,rgba(0,231,255,.16),transparent);animation:scan 3.4s linear infinite;will-change:transform}
+  @keyframes scan{0%{transform:translateY(-130px)}100%{transform:translateY(640px)}}
+  .ripple{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;z-index:4;pointer-events:none;
+    background:radial-gradient(circle,rgba(0,231,255,.8),transparent 70%);animation:rip .6s var(--ease) forwards}
+  @keyframes rip{from{transform:scale(.4);opacity:1}to{transform:scale(8);opacity:0}}
+
+  .panel{display:flex;flex-direction:column;gap:14px;width:100%;max-width:360px}
+  .card{background:rgba(0,231,255,.03);border:1px solid rgba(0,231,255,.18);border-radius:6px;padding:18px;position:relative}
+  .card::before{content:"";position:absolute;top:-1px;left:18px;width:26px;height:2px;background:var(--cy);box-shadow:0 0 8px var(--cy)}
+  .lab{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--cy);margin-bottom:13px;opacity:.85}
+  .row{display:flex;gap:9px}
+  input{flex:1;min-width:0;background:rgba(0,0,0,.5);border:1px solid rgba(0,231,255,.22);border-radius:4px;color:var(--txt);
+    padding:12px 13px;font-family:"Space Mono",monospace;font-size:13px;outline:none;transition:border-color .2s var(--ease),box-shadow .2s}
+  input:focus{border-color:var(--cy);box-shadow:0 0 0 3px rgba(0,231,255,.14)}
+  input::placeholder{color:#3a5560}
+  button{cursor:pointer;font-family:"Space Grotesk",sans-serif;font-weight:600;border:1px solid rgba(0,231,255,.35);background:rgba(0,231,255,.06);
+    color:var(--cy);border-radius:4px;height:44px;padding:0 16px;font-size:13px;letter-spacing:.04em;
+    transition:transform .13s var(--ease),background .2s,box-shadow .2s,color .2s}
+  button:hover{background:rgba(0,231,255,.16);box-shadow:0 0 18px rgba(0,231,255,.4);color:#fff}
+  button:active{transform:scale(.96)}
+  button.go{background:var(--cy);color:#021014;border-color:transparent;font-weight:700;box-shadow:0 0 22px rgba(0,231,255,.5)}
+  .nav{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.nav button{height:50px;font-size:18px;padding:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.chip{height:36px;border-radius:999px;font-size:12px;padding:0 13px}
+  .hint{font-family:"Space Mono",monospace;color:var(--muted);font-size:11.5px;line-height:1.7;margin-top:10px}
+  .toast{position:fixed;left:50%;bottom:24px;z-index:70;transform:translateX(-50%) translateY(16px);opacity:0;
+    background:rgba(0,20,26,.8);backdrop-filter:blur(14px);border:1px solid var(--cy);color:var(--cy);padding:10px 16px;border-radius:4px;
+    font-family:"Space Mono",monospace;font-size:12px;box-shadow:0 0 24px rgba(0,231,255,.3);transition:opacity .3s var(--ease),transform .3s var(--ease);pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important}.scan{display:none}}
+</style></head>
+<body>
+  <header class="top">
+    <span class="logo"><b>◈</b> KRONVOX</span>
+    <span class="sub">// virtual device · agent-controlled</span>
+    <span class="live"><span class="led" id="led"></span><span id="dev">CONNECTING</span></span>
+  </header>
+  <main class="wrap">
+    <div class="deck">
+      <span class="bracket b1"></span><span class="bracket b2"></span><span class="bracket b3"></span><span class="bracket b4"></span>
+      <div class="halo"></div>
+      <div class="core"><div class="notch"></div><div class="scan"></div><img id="screen" alt="phone" draggable="false" /></div>
+    </div>
+    <div class="panel">
+      <section class="card"><div class="lab">// type</div><div class="row"><input id="text" type="text" placeholder="text into focused field…" /><button class="go" id="send">SEND</button></div><div class="hint">tap a field on screen, then type.</div></section>
+      <section class="card"><div class="lab">// navigation</div><div class="nav"><button data-key="back">‹</button><button data-key="home">○</button><button data-key="recent">▢</button></div></section>
+      <section class="card"><div class="lab">// launch app</div><div class="row"><input id="pkg" type="text" placeholder="com.android.chrome" /><button id="open">RUN</button></div>
+        <div class="chips"><button class="chip" data-pkg="com.android.settings">Settings</button><button class="chip" data-pkg="com.android.chrome">Chrome</button><button class="chip" data-pkg="com.google.android.deskclock">Clock</button></div></section>
+      <section class="card"><div class="lab">// agent link</div><div class="hint">your AI agent drives this same device over MCP — tap, type, screenshot, read screen.</div></section>
+    </div>
+  </main>
+  <div class="toast" id="toast"></div>
+<script>
+  const img=document.getElementById("screen"),led=document.getElementById("led"),devL=document.getElementById("dev"),core=document.querySelector(".core");let dev={width:1080,height:2400};
+  function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1300);}
+  async function post(u,d){try{return (await fetch(u,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(d||{})})).ok;}catch{return false;}}
+  async function loadSize(){try{dev=await(await fetch("/size")).json();}catch{}}
+  function refresh(){const n=new Image();n.onload=()=>{img.src=n.src;led.classList.remove("off");devL.textContent="● LIVE";};n.onerror=()=>{led.classList.add("off");devL.textContent="NO DEVICE";};n.src="/screen?t="+Date.now();}
+  setInterval(refresh,850);refresh();loadSize();
+  function toDevice(e){const r=img.getBoundingClientRect();return{x:Math.round((e.clientX-r.left)/r.width*dev.width),y:Math.round((e.clientY-r.top)/r.height*dev.height),dx:e.clientX-r.left,dy:e.clientY-r.top};}
+  function ripple(x,y){const s=document.createElement("span");s.className="ripple";s.style.left=x+"px";s.style.top=y+"px";core.appendChild(s);setTimeout(()=>s.remove(),600);}
+  let down=null;
+  img.addEventListener("pointerdown",e=>{down=toDevice(e);});
+  img.addEventListener("pointerup",async e=>{if(!down)return;const up=toDevice(e);ripple(up.dx,up.dy);const d=Math.hypot(up.x-down.x,up.y-down.y);
+    if(d>24){await post("/swipe",{x1:down.x,y1:down.y,x2:up.x,y2:up.y,ms:260});toast("swipe");}else{await post("/tap",{x:up.x,y:up.y});toast("tap "+up.x+","+up.y);}down=null;});
+  document.getElementById("send").onclick=async()=>{const v=document.getElementById("text").value;if(!v)return;await post("/type",{text:v});toast("typed");document.getElementById("text").value="";};
+  document.getElementById("text").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("send").click();});
+  document.querySelectorAll("[data-key]").forEach(b=>b.onclick=()=>{post("/key",{key:b.dataset.key});toast(b.dataset.key);});
+  document.getElementById("open").onclick=()=>{const p=document.getElementById("pkg").value.trim();if(p){post("/open",{package:p});toast("run "+p);}};
+  document.querySelectorAll("[data-pkg]").forEach(b=>b.onclick=()=>{post("/open",{package:b.dataset.pkg});toast("run "+b.dataset.pkg);});
+</script>
+</body></html>

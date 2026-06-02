@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "kronvox": {
+      "command": "node",
+      "args": ["packages/mcp/dist/server.js"],
+      "env": {
+        "KRONVOX_ADB": "adb",
+        "KRONVOX_SERIAL": ""
+      }
+    }
+  }
+}

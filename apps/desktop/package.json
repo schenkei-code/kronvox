@@ -1,0 +1,14 @@
+{
+  "name": "@kronvox/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "KRONVOX desktop — unbox-and-go virtual phone for AI agents.",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.1.0"
+  }
+}
