@@ -2,9 +2,12 @@
 // webview as Tauri commands. No node sidecar: pure Rust + the baked SDK binaries.
 #![cfg_attr(all(not(debug_assertions), target_os = "windows"), windows_subsystem = "windows")]
 
+mod provision;
+
 use base64::{engine::general_purpose, Engine as _};
 use std::path::PathBuf;
 use std::process::Command;
+use tauri::AppHandle;
 
 #[cfg(windows)]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
@@ -213,22 +216,32 @@ fn start_device() -> Result<String, String> {
     if boot_status().unwrap_or_else(|_| "no_device".into()) != "no_device" {
         return Ok("already running".into());
     }
-    let avd = std::env::var("KRONVOX_AVD")
-        .ok()
-        .filter(|s| !s.is_empty())
-        .or_else(|| {
-            let out = cmd(emulator_path()).arg("-list-avds").output().ok()?;
-            String::from_utf8_lossy(&out.stdout)
-                .lines()
-                .map(|s| s.trim().to_string())
-                .find(|s| !s.is_empty())
-        })
-        .ok_or("no AVD found — run the bake step first")?;
-    cmd(emulator_path())
-        .args(["-avd", &avd, "-netdelay", "none", "-netspeed", "full", "-no-boot-anim"])
-        .spawn()
-        .map_err(|e| format!("emulator spawn failed: {}", e))?;
+    let avd = std::env::var("KRONVOX_AVD").ok().filter(|s| !s.is_empty()).unwrap_or_else(|| "kronvox".into());
+    let mut c = cmd(emulator_path());
+    c.args(["-avd", &avd, "-netdelay", "none", "-netspeed", "full", "-no-boot-anim", "-no-snapshot"]);
+    // point the emulator at our self-contained runtime
+    c.env("ANDROID_SDK_ROOT", provision::sdk_root());
+    c.env("ANDROID_HOME", provision::sdk_root());
+    // use our bundled AVD location if that's where the device lives
+    if provision::avd_home().join("kronvox.avd").join("config.ini").exists() {
+        c.env("ANDROID_AVD_HOME", provision::avd_home());
+    }
+    c.spawn().map_err(|e| format!("emulator spawn failed: {}", e))?;
     Ok(format!("booting {}", avd))
+}
+
+#[tauri::command]
+fn runtime_status() -> String {
+    if provision::runtime_ready() {
+        "ready".into()
+    } else {
+        "missing".into()
+    }
+}
+
+#[tauri::command]
+async fn start_setup(app: AppHandle) -> Result<(), String> {
+    provision::provision(app).await
 }
 
 #[tauri::command]
@@ -257,7 +270,7 @@ fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             screenshot, screen_size, tap, swipe, type_text, press_key, open_app, boot_status,
-            start_device, stop_device, mcp_config
+            start_device, stop_device, mcp_config, runtime_status, start_setup
         ])
         .run(tauri::generate_context!())
         .expect("error while running KRONVOX");

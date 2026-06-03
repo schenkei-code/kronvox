@@ -20,8 +20,7 @@ async function refresh(){
   try{ const b64 = await invoke("screenshot"); img.src="data:image/png;base64,"+b64; img.style.display="block"; ph.style.display="none"; }
   catch(e){ /* transient */ }
 }
-setInterval(pollStatus, 1500); pollStatus();
-setInterval(refresh, 800); refresh();
+function startApp(){ setInterval(pollStatus, 1500); pollStatus(); setInterval(refresh, 800); refresh(); }
 
 // ---- touchscreen ----
 function toDevice(e){const r=img.getBoundingClientRect();return{x:Math.round((e.clientX-r.left)/r.width*dev.width),y:Math.round((e.clientY-r.top)/r.height*dev.height),dx:e.clientX-r.left,dy:e.clientY-r.top};}
@@ -65,3 +64,25 @@ document.querySelectorAll("[data-client]").forEach(b=>b.onclick=async()=>{
   try{ const cfg=await invoke("mcp_config",{client:b.dataset.client}); await navigator.clipboard.writeText(cfg); toast("MCP config copied"); }
   catch(e){ toast("copy failed"); }
 });
+
+// ---- first-run setup / bootstrap ----
+const ev = window.__TAURI__.event;
+const $ = id => document.getElementById(id);
+function setProgress(pct, msg){
+  if(msg!=null) $("setup-phase").innerHTML = msg;
+  if(pct!=null){ const p=Math.max(2,Math.min(100,pct)); $("setup-fill").style.width=p+"%"; $("setup-pct").textContent=Math.round(pct)+"%"; }
+}
+async function boot(){
+  let status = "missing";
+  try{ status = await invoke("runtime_status"); }catch(e){}
+  if(status === "ready"){ startApp(); return; }
+  $("setup").classList.add("show");
+  await ev.listen("setup-progress", e=>{ const p=e.payload||{}; setProgress(p.pct, p.msg); });
+  await ev.listen("setup-done", ()=>{ setProgress(100, "<b>fertig!</b> starte dein handy…"); });
+  try{ await invoke("start_setup"); }
+  catch(e){ setProgress(null, "setup-fehler: "+e+" — bitte neu starten"); return; }
+  try{ await invoke("start_device"); }catch(e){}
+  $("setup").classList.remove("show");
+  startApp();
+}
+boot();

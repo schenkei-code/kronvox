@@ -69,12 +69,31 @@
   .mcp button:hover{border-color:var(--acid)}
   .mcp .ok{color:var(--acid)}
   .note{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);line-height:1.6;margin-top:6px}
+  #setup{position:fixed;inset:0;z-index:200;background:#0a0a0b;display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;padding:40px}
+  #setup.show{display:flex}
+  #setup::before{content:"";position:absolute;inset:-2px;opacity:.5;pointer-events:none;
+    background:linear-gradient(transparent 0 39px,rgba(255,255,255,.022) 39px 40px),linear-gradient(90deg,transparent 0 39px,rgba(255,255,255,.022) 39px 40px);background-size:40px 40px}
+  #setup .swm{font-weight:700;font-size:46px;letter-spacing:-.03em;text-transform:uppercase;z-index:2}
+  #setup .swm em{font-style:normal;-webkit-text-stroke:2px var(--paper);color:transparent}
+  #setup .st{font-family:"Space Mono",monospace;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);z-index:2;max-width:520px;line-height:1.6}
+  #setup .st b{color:var(--acid)}
+  #setup .track{width:520px;max-width:80vw;height:14px;border:2px solid var(--line);background:#000;z-index:2;overflow:hidden}
+  #setup .fill{height:100%;width:0%;background:var(--acid);box-shadow:0 0 18px var(--acid);transition:width .3s var(--e)}
+  #setup .pct{font-family:"Space Mono",monospace;font-weight:700;font-size:34px;color:var(--paper);z-index:2}
+  #setup .sub{font-family:"Space Mono",monospace;font-size:12px;color:#55555c;z-index:2;max-width:520px;line-height:1.6}
   .toast{position:fixed;left:50%;bottom:22px;z-index:70;transform:translateX(-50%) translateY(14px);opacity:0;
     background:var(--acid);color:#000;padding:10px 18px;font-family:"Space Mono",monospace;font-size:12px;font-weight:700;
     letter-spacing:.06em;text-transform:uppercase;transition:opacity .25s var(--e),transform .25s var(--e);pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style></head>
 <body>
+  <div id="setup">
+    <div class="swm">KRON<em>VOX</em></div>
+    <div class="st" id="setup-phase">dein virtuelles handy wird eingerichtet…</div>
+    <div class="track"><div class="fill" id="setup-fill"></div></div>
+    <div class="pct" id="setup-pct">0%</div>
+    <div class="sub" id="setup-sub">einmaliger download (~5 GB) — danach läuft alles offline. lehn dich zurück.</div>
+  </div>
   <header class="top">
     <div class="wm">KRON<em>VOX</em></div>
     <div class="pill off" id="pill"><span class="dot"></span><span id="pilltext">starting…</span></div>
