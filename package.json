@@ -8,7 +8,7 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build -w @kronvox/control && npm run build -w @kronvox/cli && npm run build -w @kronvox/mcp",
     "mcp": "npm run start -w @kronvox/mcp",
     "mcp:dev": "npm run dev -w @kronvox/mcp",
     "devices": "npm run start -w @kronvox/cli -- devices"

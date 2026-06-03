@@ -8,7 +8,8 @@ WORKDIR /app
 COPY . .
 
 RUN npm install --no-audit --no-fund \
- && npm run build --workspaces --if-present
+ && npm run build -w @kronvox/control \
+ && npm run build -w @kronvox/mcp
 
 ENV KRONVOX_ADB=adb
 
